@@ -1,6 +1,6 @@
 from time import sleep
-from SX127x.LoRa import *
-from SX127x.board_config import BOARD
+from pySX127x.SX127x.LoRa import *
+from pySX127x.SX127x.board_config import BOARD
 
 class MyLoRa(LoRa):
 	def __init__(self, verbose=False):
