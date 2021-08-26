@@ -1,0 +1,3 @@
+[submodule "pySX127x"]
+	path = pySX127x
+	url = https://github.com/rpsreal/pySX127x
