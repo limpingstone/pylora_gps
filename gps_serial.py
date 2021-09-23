@@ -20,7 +20,9 @@ ser.write(b'$PMTK300,200,0,0,0,0*2F\r\n')
 
 while True:
     line = ser.readline()
-    print(line)
+    line_pos = line.decode('ASCII').split(',')
+    for pos in line_pos:
+        print(pos)
 
 ser.close()
 
