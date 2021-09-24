@@ -17,13 +17,24 @@ print('Updating NMEA frequency and fix CTL to 5 Hz...')
 ser.write(b'$PMTK220,200*2C\r\n')
 ser.write(b'$PMTK300,200,0,0,0,0*2F\r\n')
 
+def parse_time(time_str): 
+    if len(time_str) != 10:
+        raise ValueError('Invalid time string!')
+
+    hour   = int(time_str[0:2])
+    minute = int(time_str[2:4])
+    second = int(time_str[4:6])
+    msec   = int(time_str[7:10])
+    print(str(hour) + ':' + str(minute) + ':' + str(second) + ' ' + str(msec) + ' UTC')
 
 try: 
     while True:
         line = ser.readline()
         line_pos = line.decode('ASCII').split(',')
-        for pos in line_pos:
-            print(pos)
+        if line_pos[0] == '$GPGGA':
+            parse_time(line_pos[1])
+            for pos in line_pos:
+                print(pos)
 
 except KeyboardInterrupt:
     print('\nClosing serial connection...')
