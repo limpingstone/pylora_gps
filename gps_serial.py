@@ -25,7 +25,7 @@ def parse_time(time_str):
     minute = int(time_str[2:4])
     second = int(time_str[4:6])
     msec   = int(time_str[7:10])
-    print(str(hour) + ':' + str(minute) + ':' + str(second) + ' ' + str(msec) + ' UTC')
+    print("%02d:%02d:%02d.%03d UTC" % (hour, minute, second, msec))
 
 try: 
     while True:
