@@ -35,8 +35,7 @@ def parse_latitude(lat_str, lat_pos):
 
     lat_deg = int  (lat_str[0:2])
     lat_min = float(lat_str[2:9])
-    print("%02d deg %f %c" % (lat_deg, lat_min, lat_pos))
-
+    print("%3d deg %.4f' %c" % (lat_deg, lat_min, lat_pos))
 
 def parse_longitude(long_str, long_pos):
     if len(long_str) != 10:
@@ -46,11 +45,13 @@ def parse_longitude(long_str, long_pos):
 
     long_deg = int  (long_str[0:3])
     long_min = float(long_str[3:10])
-    print("%02d deg %f %c" % (long_deg, long_min, long_pos))
+    print("%3d deg %.4f' %c" % (long_deg, long_min, long_pos))
 
 try: 
     while True:
         line = ser.readline()
+
+        # Need to catch UnicodeDecodeError
         line_pos = line.decode('ASCII').split(',')
         if line_pos[0] == '$GPGGA':
             parse_time     (line_pos[1])
