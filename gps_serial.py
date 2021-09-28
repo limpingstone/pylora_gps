@@ -47,6 +47,14 @@ def parse_longitude(long_str, long_pos):
     long_min = float(long_str[3:10])
     print("%3d deg %.4f' %c" % (long_deg, long_min, long_pos))
 
+def parse_speed_km(speed_str, speed_unit):
+    #if len(speed_str) != 5:
+    #    raise ValueError('Invalid speed string!')
+    if speed_unit != 'K':
+        raise ValueError('Invalid speed unit!')
+
+    print("%.2f km/h" % float(speed_str))
+
 try: 
     while True:
         line = ser.readline()
@@ -58,8 +66,8 @@ try:
             parse_latitude (line_pos[2], line_pos[3][0])
             parse_longitude(line_pos[4], line_pos[5][0])
 
-            for pos in line_pos:
-                print(pos)
+        elif line_pos[0] == '$GPVTG':
+            parse_speed_km(line_pos[7], line_pos[8])
 
 except KeyboardInterrupt:
     print('\nClosing serial connection...')
