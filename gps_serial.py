@@ -27,12 +27,36 @@ def parse_time(time_str):
     msec   = int(time_str[7:10])
     print("%02d:%02d:%02d.%03d UTC" % (hour, minute, second, msec))
 
+def parse_latitude(lat_str, lat_pos):
+    if len(lat_str) != 9:
+        raise ValueError('Invalid latitude string!')
+    elif lat_pos != 'N' and lat_pos != 'S':
+        raise ValueError('Invalid latitude orientation!')
+
+    lat_deg = int  (lat_str[0:2])
+    lat_min = float(lat_str[2:9])
+    print("%02d deg %f %c" % (lat_deg, lat_min, lat_pos))
+
+
+def parse_longitude(long_str, long_pos):
+    if len(long_str) != 10:
+        raise ValueError('Invalid longitude string!')
+    elif long_pos != 'E' and long_pos != 'W':
+        raise ValueError('Invalid longitude orientation!')
+
+    long_deg = int  (long_str[0:3])
+    long_min = float(long_str[3:10])
+    print("%02d deg %f %c" % (long_deg, long_min, long_pos))
+
 try: 
     while True:
         line = ser.readline()
         line_pos = line.decode('ASCII').split(',')
         if line_pos[0] == '$GPGGA':
-            parse_time(line_pos[1])
+            parse_time     (line_pos[1])
+            parse_latitude (line_pos[2], line_pos[3][0])
+            parse_longitude(line_pos[4], line_pos[5][0])
+
             for pos in line_pos:
                 print(pos)
 
