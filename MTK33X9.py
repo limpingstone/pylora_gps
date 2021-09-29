@@ -4,17 +4,17 @@ import threading
 class MTK33X9_data: 
     def __init__(self):
         self.debug_mode  = False
-        self.hour        = -1
-        self.minute      = -1
-        self.second      = -1
-        self.msec        = -1
-        self.lat_pos     = 'X'
-        self.lat_deg     = -1
-        self.lat_min     = -1
-        self.long_pos    = 'X'
-        self.long_deg    = -1
-        self.long_min    = -1
-        self.speed       = -1
+        self.hour        = None
+        self.minute      = None
+        self.second      = None
+        self.msec        = None
+        self.lat_pos     = None
+        self.lat_deg     = None
+        self.lat_min     = None
+        self.long_pos    = None
+        self.long_deg    = None
+        self.long_min    = None
+        self.speed       = None
 
     def parse_time(self, time_str): 
         if (len(time_str) != 10):
@@ -64,6 +64,19 @@ class MTK33X9_data:
     
         if (self.debug_mode):
             print("%.2f km/h" % self.speed)
+
+    def is_complete(self):
+        return ((self.hour is not None) and  
+                (self.minute   is not None) and  
+                (self.second   is not None) and 
+                (self.msec     is not None) and 
+                (self.lat_pos  is not None) and  
+                (self.lat_deg  is not None) and 
+                (self.lat_min  is not None) and 
+                (self.long_pos is not None) and 
+                (self.long_deg is not None) and 
+                (self.long_min is not None) and 
+                (self.speed    is not None))
     
 
 class MTK33X9_thread(threading.Thread):
@@ -89,7 +102,7 @@ class MTK33X9_thread(threading.Thread):
 
         self.current_data = MTK33X9_data()
 
-    def __del__(self):
+    def __exit__(self):
         if (self.ser.isOpen()):
             print('\nClosing serial connection...')
             self.ser.close()
@@ -108,17 +121,7 @@ class MTK33X9_thread(threading.Thread):
             elif (line_pos[0] == '$GPVTG'):
                 current_data.parse_speed_km(line_pos[7], line_pos[8])
 
-            if ((current_data.hour     is not None) and  
-                (current_data.minute   is not None) and  
-                (current_data.second   is not None) and 
-                (current_data.msec     is not None) and 
-                (current_data.lat_pos  is not None) and  
-                (current_data.lat_deg  is not None) and 
-                (current_data.lat_min  is not None) and 
-                (current_data.long_pos is not None) and 
-                (current_data.long_deg is not None) and 
-                (current_data.long_min is not None) and 
-                (current_data.speed    is not None)):
+            if (current_data.is_complete()):  
                 self.current_data = current_data 
 
     def get_current_data(self):
@@ -127,7 +130,13 @@ class MTK33X9_thread(threading.Thread):
 class MTK33X9:
     def __init__(self, dev_path): 
         self.thread = MTK33X9_thread(dev_path)
+        self.thread.daemon = True
         self.thread.start()
+
+    def __exit__(self, exc_tupe, exc_value, traceback):
+        self.stop_event.set()
+        self.thread.join()
 
     def get_current_data(self):
         return self.thread.get_current_data()
+
