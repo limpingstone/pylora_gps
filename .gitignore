@@ -2,3 +2,4 @@ upload.sh
 *~
 .*.un~
 .*.swp
+__pycache__
