@@ -3,7 +3,18 @@ import threading
 
 class MTK33X9_data: 
     def __init__(self):
-        self.debug_mode = False
+        self.debug_mode  = False
+        self.hour        = -1
+        self.minute      = -1
+        self.second      = -1
+        self.msec        = -1
+        self.lat_pos     = 'X'
+        self.lat_deg     = -1
+        self.lat_min     = -1
+        self.long_pos    = 'X'
+        self.long_deg    = -1
+        self.long_min    = -1
+        self.speed       = -1
 
     def parse_time(self, time_str): 
         if (len(time_str) != 10):
@@ -53,8 +64,8 @@ class MTK33X9_data:
     
         if (self.debug_mode):
             print("%.2f km/h" % self.speed)
-
     
+
 class MTK33X9_thread(threading.Thread):
     def __init__(self, dev_path):
         threading.Thread.__init__(self)
@@ -76,6 +87,8 @@ class MTK33X9_thread(threading.Thread):
         self.ser.write(b'$PMTK220,200*2C\r\n')
         self.ser.write(b'$PMTK300,200,0,0,0,0*2F\r\n')
 
+        self.current_data = MTK33X9_data()
+
     def __del__(self):
         if (self.ser.isOpen()):
             print('\nClosing serial connection...')
@@ -95,8 +108,26 @@ class MTK33X9_thread(threading.Thread):
             elif (line_pos[0] == '$GPVTG'):
                 current_data.parse_speed_km(line_pos[7], line_pos[8])
 
+            if ((current_data.hour     is not None) and  
+                (current_data.minute   is not None) and  
+                (current_data.second   is not None) and 
+                (current_data.msec     is not None) and 
+                (current_data.lat_pos  is not None) and  
+                (current_data.lat_deg  is not None) and 
+                (current_data.lat_min  is not None) and 
+                (current_data.long_pos is not None) and 
+                (current_data.long_deg is not None) and 
+                (current_data.long_min is not None) and 
+                (current_data.speed    is not None)):
+                self.current_data = current_data 
+
+    def get_current_data(self):
+        return self.current_data
+
 class MTK33X9:
     def __init__(self, dev_path): 
         self.thread = MTK33X9_thread(dev_path)
         self.thread.start()
 
+    def get_current_data(self):
+        return self.thread.get_current_data()
