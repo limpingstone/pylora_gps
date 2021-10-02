@@ -82,34 +82,36 @@ class MTK33X9_data:
 class MTK33X9_thread(threading.Thread):
     def __init__(self, dev_path):
         threading.Thread.__init__(self)
+        self.dev_path     = dev_path
+        self.current_data = MTK33X9_data()
 
+    def ser_init(self):
         print('Starting serial at 9600 baud...')
         self.ser = serial.Serial(
-            port     = dev_path, \
+            port     = self.dev_path, \
             baudrate = 9600)
         
         print('Updating serial configuration to 115200 baud...')
         self.ser.write(b'$PMTK251,115200*1F\r\n')
         
+        # Reinitialize serial at 115200 baud
         self.ser.close()
         self.ser = serial.Serial(
-            port     = dev_path, \
+            port     = self.dev_path, \
             baudrate = 115200)
         
         print('Updating NMEA frequency and fix CTL to 5 Hz...')
         self.ser.write(b'$PMTK220,200*2C\r\n')
         self.ser.write(b'$PMTK300,200,0,0,0,0*2F\r\n')
 
-        self.current_data = MTK33X9_data()
-
-    def __exit__(self):
+    def ser_stop(self):
         if (self.ser.isOpen()):
             print('\nClosing serial connection...')
             self.ser.close()
 
     def run(self):
         current_data = MTK33X9_data()
-        while (True):
+        while (self.kbd_interrupt == False):
             line = self.ser.readline()
 
             line_pos = line.decode('ASCII').split(',')
@@ -128,14 +130,26 @@ class MTK33X9_thread(threading.Thread):
         return self.current_data
 
 class MTK33X9:
-    def __init__(self, dev_path): 
+    def ser_init(self, dev_path):
+        # Initialize parameters 
         self.thread = MTK33X9_thread(dev_path)
         self.thread.daemon = True
+
+        # While loop flag for keyboard interrupt
+        self.thread.kbd_interrupt = False
+
+        # Open serial connection and start polling
+        self.thread.ser_init()
         self.thread.start()
 
-    def __exit__(self, exc_tupe, exc_value, traceback):
-        self.stop_event.set()
+    def ser_stop(self):
+        # Signal while loop to stop
+        self.thread.kbd_interrupt = True
+
+        # Stop polling and close serial connection
         self.thread.join()
+        self.thread.ser_stop()
+        print('Exited!')
 
     def get_current_data(self):
         return self.thread.get_current_data()
