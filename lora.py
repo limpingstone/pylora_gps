@@ -56,7 +56,18 @@ class LoRa:
 
     def read_reg(self, reg):
         return self.spi.xfer([reg, 0])[1]
-        
+
+    def listen():
+        self.write_reg(regs.REG_DIO_MAPPING_1, 0x00)
+        self.write_reg(regs.LORA_REG_OP_MODE, regs.MODE_LORA | regs.MODE_RXCON)
+
+    def transmit():
+        self.write_reg(regs.REG_DIO_MAPPING_1, 0x40)
+        self.write_reg(regs.LORA_REG_OP_MODE, regs.MODE_LORA | regs.MODE_TX)
+
+        reg0 = read.reg(regs.LORA_REG_OP_MODE)
+        reg1 = read.reg(0x12)
+
 
 lora = LoRa()
 
