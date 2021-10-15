@@ -99,6 +99,9 @@ class LoRa:
 
 lora = LoRa()
 
+lora.write_fifo("Yeet", 0)
+lora.transmit()
+
 GPIO.cleanup()
 
 
