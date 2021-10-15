@@ -70,16 +70,16 @@ class LoRa:
 
     def listen(self):
         self.write_reg(regs.REG_DIO_MAPPING_1, 0x00)
-        self.write_reg(regs.LORA_REG_OP_MODE, regs.MODE_LORA | regs.MODE_RXCON)
+        self.write_reg(regs.REG_OP_MODE, regs.MODE_LORA | regs.MODE_RXCON)
 
         self.irq_seen = False
 
     def transmit(self):
         self.write_reg(regs.REG_DIO_MAPPING_1, 0x40)
-        self.write_reg(regs.LORA_REG_OP_MODE, regs.MODE_LORA | regs.MODE_TX)
+        self.write_reg(regs.REG_OP_MODE, regs.MODE_LORA | regs.MODE_TX)
 
-        reg0 = read.reg(regs.LORA_REG_OP_MODE)
-        reg1 = read.reg(0x12)
+        reg0 = self.read_reg(regs.REG_OP_MODE)
+        reg1 = self.read_reg(0x12)
 
         while (self.irq_seen == True):
             if (self.irq_cv.wait(timeout = 1) == False):
@@ -87,19 +87,19 @@ class LoRa:
 
         self.irq_seen = True
 
-        return self.irq_data == MASK_IRQFLAGS_TXDONE
+        return self.irq_data == regs.MASK_IRQFLAGS_TXDONE
 
     def write_fifo(self, buf, offset):
-        self.write_reg(REG_FIFO_ADDR_PTR, offset)
-        self.spi.xfer([REG_FIFO | WRITE_MASK] + buf)
+        self.write_reg(regs.REG_FIFO_ADDR_PTR, offset)
+        self.spi.xfer([regs.REG_FIFO | regs.WRITE_MASK] + buf)
 
     def read_fifo(self, buf, offset):
-        self.write_reg(REG_FIFO_ADDR_PTR, offset)
-        return self.spi.xfer([REG_FIFO | WRITE_MASK] + [0 for _ in range(255)])[1:]
+        self.write_reg(regs.REG_FIFO_ADDR_PTR, offset)
+        return self.spi.xfer([regs.REG_FIFO | regs.WRITE_MASK] + [0 for _ in range(255)])[1:]
 
 lora = LoRa()
 
-lora.write_fifo("Yeet", 0)
+lora.write_fifo([59, 65, 65, 74], 0)
 lora.transmit()
 
 GPIO.cleanup()
