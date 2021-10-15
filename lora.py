@@ -19,7 +19,8 @@ class LoRa:
         self.spi = spidev.SpiDev()
         self.spi.open(0, LoRa.CS)
         self.spi.max_speed_hz = 5000000
-        
+
+        self.irq_seen = True
         GPIO.add_event_detect(LoRa.DIO0, GPIO.RISING, callback=self.isr)
 
     
@@ -49,7 +50,14 @@ class LoRa:
                 raise Exception('Failed to write to register!')
 
     def isr(self): 
-        print("ISR")
+        # Read irq_data register
+        self.irq_data = self.read_reg(regs.REG_IRQFLAGS)
+
+        # Clear IRQ flag. Needs to be done twice for some reason (hw errata?)
+        self.write_reg(regs.REG_IRQFLAGS, 0xFF)
+        self.write_reg(regs.REG_IRQFLAGS, 0xFF)
+
+        self.irq_seen = False
 
     def write_reg(self, reg, val):
         self.spi.xfer([reg | regs.WRITE_MASK, val])
@@ -61,12 +69,22 @@ class LoRa:
         self.write_reg(regs.REG_DIO_MAPPING_1, 0x00)
         self.write_reg(regs.LORA_REG_OP_MODE, regs.MODE_LORA | regs.MODE_RXCON)
 
+        self.irq_seen = False
+
     def transmit():
         self.write_reg(regs.REG_DIO_MAPPING_1, 0x40)
         self.write_reg(regs.LORA_REG_OP_MODE, regs.MODE_LORA | regs.MODE_TX)
 
         reg0 = read.reg(regs.LORA_REG_OP_MODE)
         reg1 = read.reg(0x12)
+
+        while (self.irq_seen == True):
+            pass
+
+        ret = self.irq_data == MASK_IRQFLAGS_TXDONE
+        self.irq_seen = True
+
+        return ret
 
 
 lora = LoRa()
