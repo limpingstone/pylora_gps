@@ -68,13 +68,13 @@ class LoRa:
     def read_reg(self, reg):
         return self.spi.xfer([reg, 0])[1]
 
-    def listen():
+    def listen(self):
         self.write_reg(regs.REG_DIO_MAPPING_1, 0x00)
         self.write_reg(regs.LORA_REG_OP_MODE, regs.MODE_LORA | regs.MODE_RXCON)
 
         self.irq_seen = False
 
-    def transmit():
+    def transmit(self):
         self.write_reg(regs.REG_DIO_MAPPING_1, 0x40)
         self.write_reg(regs.LORA_REG_OP_MODE, regs.MODE_LORA | regs.MODE_TX)
 
@@ -89,6 +89,13 @@ class LoRa:
 
         return self.irq_data == MASK_IRQFLAGS_TXDONE
 
+    def write_fifo(self, buf, offset):
+        self.write_reg(REG_FIFO_ADDR_PTR, offset)
+        self.spi.xfer([REG_FIFO | WRITE_MASK] + buf)
+
+    def read_fifo(self, buf, offset):
+        self.write_reg(REG_FIFO_ADDR_PTR, offset)
+        return self.spi.xfer([REG_FIFO | WRITE_MASK] + [0 for _ in range(255)])[1:]
 
 lora = LoRa()
 
