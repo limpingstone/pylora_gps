@@ -2,6 +2,7 @@ import time
 import RPi.GPIO as GPIO
 import spidev
 import lora_reg as regs
+import threading
 
 class LoRa:
     DIO0 = 4
@@ -21,6 +22,7 @@ class LoRa:
         self.spi.max_speed_hz = 5000000
 
         self.irq_seen = True
+        self.irq_cv = threading.Condition()
         GPIO.add_event_detect(LoRa.DIO0, GPIO.RISING, callback=self.isr)
 
     
@@ -58,6 +60,7 @@ class LoRa:
         self.write_reg(regs.REG_IRQFLAGS, 0xFF)
 
         self.irq_seen = False
+        self.irq_cv.notify()
 
     def write_reg(self, reg, val):
         self.spi.xfer([reg | regs.WRITE_MASK, val])
@@ -79,12 +82,12 @@ class LoRa:
         reg1 = read.reg(0x12)
 
         while (self.irq_seen == True):
-            pass
+            if (self.irq_cv.wait(timeout = 1) == False):
+                return False
 
-        ret = self.irq_data == MASK_IRQFLAGS_TXDONE
         self.irq_seen = True
 
-        return ret
+        return self.irq_data == MASK_IRQFLAGS_TXDONE
 
 
 lora = LoRa()
