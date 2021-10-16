@@ -108,8 +108,12 @@ class LoRa:
 
 lora = LoRa()
 
-lora.write_fifo([89, 101, 101, 116], 0)
-lora.transmit()
+lora.listen()
+buff = lora.read_fifo(0)
+#for char in buff:
+#    print(ord(char), end='')
+
+print(bytes(buff).hex())
 
 GPIO.cleanup()
 
