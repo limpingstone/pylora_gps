@@ -20,7 +20,7 @@ class LoRa:
 
         self.spi = spidev.SpiDev()
         self.spi.open(0, LoRa.CS)
-        self.spi.max_speed_hz = 5000000
+        self.spi.max_speed_hz = 1000000
 
         self.irq_seen = False
 <<<<<<< HEAD
@@ -58,7 +58,7 @@ class LoRa:
 
     def isr(self, channel): 
         # Read irq_data register
-        print("ISR!")
+        sys.stderr.write("ISR!\n")
         self.irq_data = self.read_reg(regs.REG_IRQFLAGS)
 
         #if (self.irq_data != regs.MASK_IRQFLAGS_RXDONE | regs.MASK_IRQFLAGS_VALIDHEADER):
@@ -119,12 +119,15 @@ class LoRa:
 lora = LoRa()
 
 while True:
-    lora.listen()
+    lora.irq_seen = True
+    if (not lora.listen()):
+        sys.stderr.write('Timeout reached!\n')
     buff = lora.read_fifo(0)
     #for char in buff:
     #    print(ord(char), end='')
     
-    print(bytes(buff).hex())
+    sys.stderr.write(bytes(buff).hex())
+    sys.stderr.write('\n')
     time.sleep(1)
     break
 
