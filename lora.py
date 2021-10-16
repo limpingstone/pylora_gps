@@ -83,8 +83,9 @@ class LoRa:
         reg0 = self.read_reg(regs.REG_OP_MODE)
         reg1 = self.read_reg(0x12)
 
-        with self.irq_cv: 
-            while (self.irq_seen == True):
+
+        while (self.irq_seen == True):
+            with self.irq_cv: 
                 if (self.irq_cv.wait(timeout = 1) == False):
                     return False
 
