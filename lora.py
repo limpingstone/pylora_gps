@@ -23,7 +23,10 @@ class LoRa:
         self.spi.max_speed_hz = 5000000
 
         self.irq_seen = False
+<<<<<<< HEAD
         self.irq_data = None
+=======
+>>>>>>> cb36340 (While loop)
         self.irq_cv = threading.Condition()
         GPIO.add_event_detect(LoRa.DIO0, GPIO.RISING, callback=self.isr)
 
@@ -55,6 +58,7 @@ class LoRa:
 
     def isr(self, channel): 
         # Read irq_data register
+        print("ISR!")
         self.irq_data = self.read_reg(regs.REG_IRQFLAGS)
 
         #if (self.irq_data != regs.MASK_IRQFLAGS_RXDONE | regs.MASK_IRQFLAGS_VALIDHEADER):
@@ -115,15 +119,14 @@ class LoRa:
 lora = LoRa()
 
 while True:
-    if (not lora.listen()):
-        sys.stderr.write('Timeout reached!\n')
-    buff = lora.read_fifo()
+    lora.listen()
+    buff = lora.read_fifo(0)
     #for char in buff:
     #    print(ord(char), end='')
     
-    sys.stderr.write(bytes(buff).hex())
-    sys.stderr.write('\n')
+    print(bytes(buff).hex())
     time.sleep(1)
+    break
 
 GPIO.cleanup()
 
