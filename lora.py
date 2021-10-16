@@ -60,7 +60,9 @@ class LoRa:
         self.write_reg(regs.REG_IRQFLAGS, 0xFF)
 
         self.irq_seen = False
-        self.irq_cv.notify()
+
+        with self.irq_cv: 
+            self.irq_cv.notify()
 
     def write_reg(self, reg, val):
         self.spi.xfer([reg | regs.WRITE_MASK, val])
@@ -81,9 +83,10 @@ class LoRa:
         reg0 = self.read_reg(regs.REG_OP_MODE)
         reg1 = self.read_reg(0x12)
 
-        while (self.irq_seen == True):
-            if (self.irq_cv.wait(timeout = 1) == False):
-                return False
+        with self.irq_cv: 
+            while (self.irq_seen == True):
+                if (self.irq_cv.wait(timeout = 1) == False):
+                    return False
 
         self.irq_seen = True
 
