@@ -107,3 +107,13 @@ class LoRa:
         self.write_reg(regs.REG_FIFO_ADDR_PTR, offset)
         return self.spi.xfer([regs.REG_FIFO] + [0 for _ in range(255)])[1:]
 
+lora = LoRa()
+
+while True:
+    print("Sending packet...")
+    lora.write_fifo([89, 101, 101, 116], 0)
+    lora.transmit()
+    time.sleep(1)
+
+GPIO.cleanup()
+
