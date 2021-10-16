@@ -80,10 +80,6 @@ class LoRa:
         self.write_reg(regs.REG_DIO_MAPPING_1, 0x40)
         self.write_reg(regs.REG_OP_MODE, regs.MODE_LORA | regs.MODE_TX)
 
-        reg0 = self.read_reg(regs.REG_OP_MODE)
-        reg1 = self.read_reg(0x12)
-
-
         while (self.irq_seen == True):
             with self.irq_cv: 
                 if (self.irq_cv.wait(timeout = 1) == False):
