@@ -96,13 +96,13 @@ class LoRa:
         self.write_reg(regs.REG_FIFO_ADDR_PTR, offset)
         self.spi.xfer([regs.REG_FIFO | regs.WRITE_MASK] + buf)
 
-    def read_fifo(self, buf, offset):
+    def read_fifo(self, offset):
         self.write_reg(regs.REG_FIFO_ADDR_PTR, offset)
         return self.spi.xfer([regs.REG_FIFO | regs.WRITE_MASK] + [0 for _ in range(255)])[1:]
 
 lora = LoRa()
 
-lora.write_fifo([59, 65, 65, 74], 0)
+lora.write_fifo([89, 101, 101, 116], 0)
 lora.transmit()
 
 GPIO.cleanup()
