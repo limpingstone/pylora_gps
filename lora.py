@@ -51,7 +51,7 @@ class LoRa:
             if (val != pair[1]):
                 raise Exception('Failed to write to register!')
 
-    def isr(self): 
+    def isr(self, channel): 
         # Read irq_data register
         self.irq_data = self.read_reg(regs.REG_IRQFLAGS)
 
