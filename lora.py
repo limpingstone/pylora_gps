@@ -117,17 +117,15 @@ lora = LoRa()
 
 
 while True:
-    lora.irq_seen = True
     if (not lora.listen()):
         sys.stderr.write('Timeout reached!\n')
-    buff = lora.read_fifo(0)
+    buff = lora.read_fifo()
     #for char in buff:
     #    print(ord(char), end='')
     
     sys.stderr.write(bytes(buff).hex())
     sys.stderr.write('\n')
     time.sleep(1)
-    break
 
 GPIO.cleanup()
 
