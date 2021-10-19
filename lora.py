@@ -20,7 +20,7 @@ class LoRa:
 
         self.spi = spidev.SpiDev()
         self.spi.open(0, LoRa.CS)
-        self.spi.max_speed_hz = 1000000
+        self.spi.max_speed_hz = 5000000
 
         self.irq_seen = False
         self.irq_cv = threading.Condition()
@@ -54,12 +54,11 @@ class LoRa:
 
     def isr(self, channel): 
         # Read irq_data register
-        sys.stderr.write("ISR!\n")
         self.irq_data = self.read_reg(regs.REG_IRQFLAGS)
 
-        if (self.irq_data != regs.MASK_IRQFLAGS_RXDONE | regs.MASK_IRQFLAGS_VALIDHEADER):
-            sys.stderr.write("Bad data!\n")
-            sys.stderr.write(bin(self.irq_data) + '\n')
+        #if (self.irq_data != regs.MASK_IRQFLAGS_RXDONE | regs.MASK_IRQFLAGS_VALIDHEADER):
+        #    sys.stderr.write("Bad data!\n")
+        #    sys.stderr.write(bin(self.irq_data) + '\n')
 
         # Clear IRQ flag. Needs to be done twice for some reason (hw errata?)
         self.write_reg(regs.REG_IRQFLAGS, 0xFF)
