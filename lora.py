@@ -22,6 +22,7 @@ class LoRa:
         self.spi.max_speed_hz = 5000000
 
         self.irq_seen = True
+        self.irq_data = None
         self.irq_cv = threading.Condition()
         GPIO.add_event_detect(LoRa.DIO0, GPIO.RISING, callback=self.isr)
 
@@ -105,12 +106,4 @@ class LoRa:
         
         self.write_reg(regs.REG_FIFO_ADDR_PTR, offset)
         return self.spi.xfer([regs.REG_FIFO] + [0 for _ in range(255)])[1:]
-
-lora = LoRa()
-
-lora.write_fifo([89, 101, 101, 116], 0)
-lora.transmit()
-
-GPIO.cleanup()
-
 
