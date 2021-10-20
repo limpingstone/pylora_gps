@@ -113,7 +113,7 @@ while True:
     print("Sending packet...")
     lora.write_fifo([89, 101, 101, 116], 0)
     lora.transmit()
-    time.sleep(1)
+    time.sleep(.5)
 
 GPIO.cleanup()
 
