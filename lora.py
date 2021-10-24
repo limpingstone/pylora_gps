@@ -21,7 +21,7 @@ class LoRa:
         self.spi.open(0, LoRa.CS)
         self.spi.max_speed_hz = 5000000
 
-        self.irq_seen = True
+        self.irq_seen = False
         self.irq_data = None
         self.irq_cv = threading.Condition()
         GPIO.add_event_detect(LoRa.DIO0, GPIO.RISING, callback=self.isr)
