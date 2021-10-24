@@ -113,7 +113,6 @@ class LoRa:
 
 lora = LoRa()
 
-
 while True:
     if (not lora.listen()):
         sys.stderr.write('Timeout reached!\n')
