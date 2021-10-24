@@ -2,7 +2,7 @@
 def str_to_byte(input_str):
     byte_str = []
     for char in list(input_str):
-        byte_str.append(ord(char)
+        byte_str.append(ord(char))
 
     return byte_str
 
