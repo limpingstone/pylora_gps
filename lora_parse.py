@@ -8,7 +8,7 @@ def str_to_byte(input_str):
 
 def byte_to_str(input_byte):
     output_str = ""
-    for byte in byte_str: 
+    for byte in input_byte: 
         output_str += chr(byte)
 
     return output_str
