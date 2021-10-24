@@ -116,8 +116,8 @@ DEFAULT_MODEM_CONFIG = [
     # Set the frequency to 915MHz
     # We can use FREQ_TO_REG() here because it is declared as `constexpr`
     # and can therefore be evaluated at compile-time
-    (REG_FR_MSB, (freq_to_reg(915000000) >> 16) & 0b11111111),
-    (REG_FR_MID, (freq_to_reg(915000000) >> 8) & 0b11111111),
-    (REG_FR_LSB, freq_to_reg(915000000) & 0b11111111),
+    (REG_FR_MSB, (freq_to_reg(920000000) >> 16) & 0b11111111),
+    (REG_FR_MID, (freq_to_reg(920000000) >> 8) & 0b11111111),
+    (REG_FR_LSB, freq_to_reg(920000000) & 0b11111111),
 ]
 
