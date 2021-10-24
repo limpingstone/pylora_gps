@@ -3,6 +3,7 @@ import sys
 import RPi.GPIO as GPIO
 import spidev
 import lora_reg as regs
+import lora_parse
 import threading
 
 class LoRa:
@@ -121,7 +122,7 @@ while True:
     #for char in buff:
     #    print(ord(char), end='')
     
-    sys.stderr.write(bytes(buff).hex())
+    sys.stderr.write(lora_parse.byte_to_str(buff))
     sys.stderr.write('\n')
     time.sleep(1)
 
