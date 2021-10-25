@@ -44,7 +44,7 @@ def main():
             if (current_data.is_complete()):
                 #print_gps_info(current_data)
 
-                buff = "%02d:%02d:%02d.%03d,%2d %.4f %c,%03d %.4f %c" % (
+                buff = "%02d:%02d:%02d.%03d,%2d %.4f %c,%03d %.4f %c, %.2f" % (
                     current_data.hour, 
                     current_data.minute, 
                     current_data.second, 
@@ -54,10 +54,13 @@ def main():
                     current_data.lat_pos,
                     current_data.long_deg, 
                     current_data.long_min, 
-                    current_data.long_pos
+                    current_data.long_pos,
+                    current_data.speed
                 )
 
                 print(buff)
+                len_padding = 256 - len(buff)
+                buff = buff.ljust(len_padding, ' ')
 
                 lora.write_fifo(lora_parse.str_to_byte(buff), 0)
                 lora.transmit()
