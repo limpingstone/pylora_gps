@@ -3,6 +3,7 @@ from MTK33X9 import MTK33X9
 from lora import LoRa
 import lora_parse
 import time
+import sys
 
 def print_gps_info(current_data):
     print("%02d:%02d:%02d.%03d UTC" % (
@@ -44,7 +45,7 @@ def main():
             if (current_data.is_complete()):
                 #print_gps_info(current_data)
 
-                buff = "%02d:%02d:%02d.%03d,%2d %.4f %c,%03d %.4f %c, %.2f" % (
+                buff = ">>>>%02d:%02d:%02d.%03d,%2d %.4f %c,%03d %.4f %c, %.2f" % (
                     current_data.hour, 
                     current_data.minute, 
                     current_data.second, 
@@ -58,6 +59,7 @@ def main():
                     current_data.speed
                 )
 
+                # Construct packet sent
                 print(buff)
                 len_padding = 256 - len(buff)
                 buff = buff.ljust(len_padding, ' ')
@@ -66,8 +68,18 @@ def main():
                 lora.transmit()
     
             time.sleep(0.1)
+
+            if (not lora.listen()):
+                sys.stderr.write('Timeout reached!\n')
+
+            buff = lora.read_fifo()
+            print(lora_parse.byte_to_str(buff)[1:60])
+
+            time.sleep(0.1)
+
     except KeyboardInterrupt: 
         mtk33x9.ser_stop()
+        GPIO.cleanup()
 
 if __name__ == "__main__":
     main()
