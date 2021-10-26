@@ -1,9 +1,13 @@
 #!/usr/bin/python3
 from MTK33X9 import MTK33X9
 from lora import LoRa
+import RPi.GPIO as GPIO
 import lora_parse
 import time
 import sys
+
+# define dev_path and dev_name in config.py
+import config
 
 def print_gps_info(current_data):
     print("%02d:%02d:%02d.%03d UTC" % (
@@ -35,7 +39,7 @@ def print_gps_info(current_data):
 
 def main(): 
     mtk33x9 = MTK33X9()
-    mtk33x9.ser_init('/dev/serial0')
+    mtk33x9.ser_init(config.dev_path)
 
     lora = LoRa()
 
@@ -45,7 +49,8 @@ def main():
             if (current_data.is_complete()):
                 #print_gps_info(current_data)
 
-                buff = ">>>>%02d:%02d:%02d.%03d,%2d %.4f %c,%03d %.4f %c, %.2f" % (
+                buff = ">>>>%s: %02d:%02d:%02d.%03d,%2d %.4f %c,%03d %.4f %c, %.2f" % (
+                    config.dev_name,
                     current_data.hour, 
                     current_data.minute, 
                     current_data.second, 
@@ -60,7 +65,7 @@ def main():
                 )
 
                 # Construct packet sent
-                print(buff)
+                print("Tx sending: " + buff)
                 len_padding = 256 - len(buff)
                 buff = buff.ljust(len_padding, ' ')
 
@@ -73,7 +78,7 @@ def main():
                 sys.stderr.write('Timeout reached!\n')
 
             buff = lora.read_fifo()
-            print(lora_parse.byte_to_str(buff)[1:60])
+            print("Rx received: " + lora_parse.byte_to_str(buff)[1:60])
 
             time.sleep(0.1)
 
