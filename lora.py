@@ -4,6 +4,9 @@ import spidev
 import lora_reg as regs
 import threading
 
+# define timeout in config.py
+import config
+
 class LoRa:
     DIO0 = 4
     RST  = 22
@@ -24,6 +27,7 @@ class LoRa:
         self.irq_seen = False
         self.irq_data = None
         self.irq_cv = threading.Condition()
+        self.timeout = config.timeout
         GPIO.add_event_detect(LoRa.DIO0, GPIO.RISING, callback=self.isr)
 
     
@@ -77,7 +81,7 @@ class LoRa:
 
         while (self.irq_seen == False):
             with self.irq_cv: 
-                if (self.irq_cv.wait(timeout = 1) == False):
+                if (self.irq_cv.wait(timeout = self.timeout) == False):
                     return False
 
         self.irq_seen = False
@@ -90,7 +94,7 @@ class LoRa:
 
         while (self.irq_seen == False):
             with self.irq_cv: 
-                if (self.irq_cv.wait(timeout = 1) == False):
+                if (self.irq_cv.wait(timeout = self.timeout) == False):
                     return False
 
         self.irq_seen = False
