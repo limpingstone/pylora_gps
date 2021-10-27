@@ -49,7 +49,7 @@ def main():
             if (current_data.is_complete()):
                 #print_gps_info(current_data)
 
-                buff = ">>>>%s: %02d:%02d:%02d.%03d,%2d %.4f %c,%03d %.4f %c, %.2f" % (
+                buff = ">>>>%s:%02d%02d%02d.%03d,%2d%.4f,%c,%03d%.4f,%c,%.2f" % (
                     config.dev_name,
                     current_data.hour, 
                     current_data.minute, 
