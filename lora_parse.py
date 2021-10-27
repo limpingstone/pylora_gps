@@ -20,7 +20,12 @@ def str_to_data(rx_str):
 
     # Remove extra '>' padding
     rx_str_arr = rx_str.split('>')
-    rx_str = rx_str_arr[len(rx_str_arr) - 1]
+
+    # Detect for garbled data
+    if len(rx_str_arr) < 3:
+        return None
+
+    rx_str = rx_str_arr[len(rx_str_arr) - 2]
 
     # Extract device name from received string
     rx_str_arr = rx_str.split(':')
@@ -30,6 +35,7 @@ def str_to_data(rx_str):
     # Extract received GPS data 
     rx_str = rx_str_arr[1]
     rx_str_arr = rx_str.split(',')
+
     rx_data.parse_time     (rx_str_arr[0])
     rx_data.parse_latitude (rx_str_arr[1], rx_str_arr[2])
     rx_data.parse_longitude(rx_str_arr[3], rx_str_arr[4])
