@@ -114,17 +114,20 @@ class MTK33X9_thread(threading.Thread):
         while (self.kbd_interrupt == False):
             line = self.ser.readline()
 
-            line_pos = line.decode('ASCII').split(',')
-            if (line_pos[0] == '$GPGGA' or line_pos[0] == '$GNGGA'):
-                current_data.parse_time     (line_pos[1])
-                current_data.parse_latitude (line_pos[2], line_pos[3][0])
-                current_data.parse_longitude(line_pos[4], line_pos[5][0])
+            try 
+                line_pos = line.decode('ASCII').split(',')
+                if (line_pos[0] == '$GPGGA' or line_pos[0] == '$GNGGA'):
+                    current_data.parse_time     (line_pos[1])
+                    current_data.parse_latitude (line_pos[2], line_pos[3][0])
+                    current_data.parse_longitude(line_pos[4], line_pos[5][0])
+        
+                elif (line_pos[0] == '$GPVTG' or line_pos[0] == '$GNVTG'):
+                    current_data.parse_speed_km(line_pos[7], line_pos[8])
     
-            elif (line_pos[0] == '$GPVTG' or line_pos[0] == '$GNVTG'):
-                current_data.parse_speed_km(line_pos[7], line_pos[8])
-
-            if (current_data.is_complete()):  
-                self.current_data = current_data 
+                if (current_data.is_complete()):  
+                    self.current_data = current_data 
+            except UnicodeDecodeError
+                print('Skipped line!')
 
     def get_current_data(self):
         return self.current_data
