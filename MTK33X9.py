@@ -114,7 +114,7 @@ class MTK33X9_thread(threading.Thread):
         while (self.kbd_interrupt == False):
             line = self.ser.readline()
 
-            try 
+            try:
                 line_pos = line.decode('ASCII').split(',')
                 if (line_pos[0] == '$GPGGA' or line_pos[0] == '$GNGGA'):
                     current_data.parse_time     (line_pos[1])
@@ -126,7 +126,7 @@ class MTK33X9_thread(threading.Thread):
     
                 if (current_data.is_complete()):  
                     self.current_data = current_data 
-            except UnicodeDecodeError
+            except UnicodeDecodeError:
                 print('Skipped line!')
 
     def get_current_data(self):
