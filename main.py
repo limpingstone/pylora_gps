@@ -90,7 +90,10 @@ def main():
 
             time.sleep(0.1)
 
-            rx_data = lora_receive_data(lora)
+            try: 
+                rx_data = lora_receive_data(lora)
+            except IndexError:
+                print('Current data received not valid!') 
             
             if (rx_data != None):
                 print('Received GPS information: ')
