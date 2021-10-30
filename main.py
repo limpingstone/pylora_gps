@@ -69,7 +69,7 @@ def lora_receive_data(lora):
         return None
     else:
         buff = lora.read_fifo()
-        print("Rx received: " + lora_parse.byte_to_str(buff)[1:80])
+        #print("Rx received: " + lora_parse.byte_to_str(buff)[1:80])
         buff = lora_parse.byte_to_str(buff[1:80])
 
         return lora_parse.str_to_data(buff)
@@ -89,6 +89,7 @@ def main():
             if (current_data.is_complete()):
                 lora_send_data(lora, current_data)
 
+                #print('Sent GPS information...')
                 print('Sent GPS information: ')
                 print_gps_info(current_data)
 
@@ -98,6 +99,7 @@ def main():
                 incoming_data = lora_receive_data(lora)
                 if (incoming_data.is_complete()):
                     rx_data = incoming_data
+                    #print('Received GPS information...')
                     print('Received GPS information: ')
                     print_gps_info(rx_data)
                     
