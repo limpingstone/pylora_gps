@@ -128,6 +128,10 @@ class MTK33X9_thread(threading.Thread):
                     self.current_data = current_data 
             except UnicodeDecodeError:
                 print('Skipped line!')
+            except ValueError: 
+                print('Skipped line!')
+            except IndexError: 
+                print('No incoming GPS data!')
 
     def get_current_data(self):
         return self.current_data
