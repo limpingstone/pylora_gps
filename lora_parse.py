@@ -23,7 +23,7 @@ def str_to_data(rx_str):
 
     # Detect for garbled data
     if len(rx_str_arr) < 3:
-        return None
+        return rx_data
 
     rx_str = rx_str_arr[len(rx_str_arr) - 2]
 

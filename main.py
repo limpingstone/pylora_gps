@@ -1,10 +1,13 @@
 #!/usr/bin/python3
 from MTK33X9 import MTK33X9
+from MTK33X9 import MTK33X9_data
 from lora import LoRa
+from calc_prediction import Prediction
 import RPi.GPIO as GPIO
 import lora_parse
 import time
 import sys
+
 
 # define dev_path and dev_name in config.py
 import config
@@ -33,7 +36,6 @@ def print_gps_info(current_data):
     )
         
     print("%.2f km/h" % current_data.speed)
-    print()
 
 
 def lora_send_data(lora, current_data):
@@ -63,7 +65,7 @@ def lora_send_data(lora, current_data):
 
 def lora_receive_data(lora):
     if (not lora.listen()):
-        sys.stderr.write('Timeout reached!\n')
+        raise TimeoutError()
         return None
     else:
         buff = lora.read_fifo()
@@ -79,6 +81,8 @@ def main():
 
     lora = LoRa()
 
+    rx_data = MTK33X9_data()
+
     try: 
         while (True):
             current_data = mtk33x9.get_current_data()
@@ -91,15 +95,26 @@ def main():
             time.sleep(0.1)
 
             try: 
-                rx_data = lora_receive_data(lora)
+                incoming_data = lora_receive_data(lora)
+                if (incoming_data.is_complete()):
+                    rx_data = incoming_data
+                    print('Received GPS information: ')
+                    print_gps_info(rx_data)
+                    
+            except TimeoutError:
+                print('Timeout reached!')
             except IndexError:
                 print('Current data received not valid!') 
             
-            if (rx_data != None):
-                print('Received GPS information: ')
-                print_gps_info(rx_data)
-
             time.sleep(0.1)
+
+            if (current_data.is_complete() and rx_data.is_complete()):
+                print('-------------------------------')
+                current_prediction = Prediction(current_data, rx_data)
+                print("Real time data: " + str(current_prediction.is_realtime))
+
+            print('===============================================')
+            print()
 
     except KeyboardInterrupt: 
         mtk33x9.ser_stop()
