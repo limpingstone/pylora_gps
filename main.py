@@ -115,6 +115,9 @@ def main():
                 current_prediction = Prediction(current_data, rx_data)
                 print("Real time data: " + str(current_prediction.is_realtime))
 
+                if (current_prediction.is_realtime):
+                    print('Distance: ' + str(current_prediction.distance) + ' m')
+
             print('===============================================')
             print()
 
